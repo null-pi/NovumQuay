@@ -1,0 +1,20 @@
+# CASS -> Common AI Service System
+services:
+  core:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    image: ${IMAGE_NAME}
+    container_name: ${CONTAINER_NAME}
+    ports:
+      - ${SERVER_PORT}:${SERVER_PORT}
+    env_file:
+      - .env
+    volumes:
+      - ./src:/app/src
+    networks:
+      - novumquay-network
+
+networks:
+  novumquay-network:
+    external: true
