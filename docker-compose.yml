@@ -1,4 +1,3 @@
-# CASS -> Common AI Service System
 services:
   core:
     build: 

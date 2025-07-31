@@ -1,13 +1,14 @@
 import logging
 import uuid
 
-from fastapi import WebSocket
+from starlette.websockets import WebSocketState, WebSocket
 
 logger = logging.getLogger(__name__)
 
 class ConnectionManager:
     def __init__(self):
         self.connections: dict[str, WebSocket] = {}
+
 
     async def connect(self, connection: WebSocket):
         try:
@@ -20,11 +21,12 @@ class ConnectionManager:
             logger.error(f"Error during connection: {e}")
             raise e
 
+
     async def disconnect(self, connection_id: str):
         try:
             connection = self.get_connection(connection_id)
 
-            if connection.client_state == 1:  # CONNECTED
+            if connection.client_state == WebSocketState.CONNECTED:
                 logger.info(f"Disconnecting connection: {connection_id}")
                 await connection.close(code=1000, reason="Normal Closure")
                 del self.connections[connection_id]
@@ -32,6 +34,7 @@ class ConnectionManager:
         except Exception as e:
             logger.error(f"Error during disconnection: {e}")
             raise e
+
 
     def get_connection(self, connection_id: str) -> WebSocket | None:
         try:
@@ -51,7 +54,7 @@ class ConnectionManager:
         try:
             connection = self.get_connection(connection_id)
 
-            if connection.client_state == 1:  # CONNECTED
+            if connection.client_state == WebSocketState.CONNECTED:
                 await connection.send_text(message)
                 logger.info(f"Message sent to {connection_id}: {message}")
             else:
